@@ -6,29 +6,61 @@
   However, January 1, 2006 started on a Sunday; under the ISO 8601 week definition, this is considered the 52nd week of 2005.
 */
 var getWeekNr;
-("undefined" == typeof getWeekNr) && (getWeekNr = (function () {
-  var DAY_IN_MS = 1000 * 60 * 60 * 24
-    , WEEKDAY_WEDNESDAY = 3;
-
-  function getFirstWednesdayOfYear(year) {
-    var day = 1, date = new Date(year, 0, day);
-    while (date.getDay() != WEEKDAY_WEDNESDAY) {
-      date = new Date(year, 0, ++day);
+("undefined"==typeof getWeekNr) && (getWeekNr= (function () {
+  var DAY_IN_MS = 1000*60*60*24, DAY_MONDAY = 1, DAY_SUNDAY = 0, MONTH_JAN = 0, MONTH_DEC = 11;
+  
+  function getStartOfFirstWeek(year) {
+    var firstWeekDate = new Date(year, 0, 4)
+      , startofFirstWeek = new Date(+firstWeekDate);
+    while (startofFirstWeek.getDay() != DAY_MONDAY) {
+      startofFirstWeek = new Date(+startofFirstWeek-DAY_IN_MS);
     }
-    return date;
+    return startofFirstWeek;
   }
 
-  function getDateForStartOfWeek1OfYear(year) {
-    var firstWednesdayOfYear = getFirstWednesdayOfYear(year)
-      , dateForStartOfWeek1OfYear = new Date(year, 0, firstWednesdayOfYear.getDate() - 2);
-    return dateForStartOfWeek1OfYear;
+  function getStartOfThisWeek(date) {
+    var d = new Date(+date);
+    while(d.getDay()!=1) {d = new Date(+d-DAY_IN_MS);}
+    return d;
   }
 
-  return function (date) {
-    var startOfWeek1OfYear = getDateForStartOfWeek1OfYear(date.getFullYear())
-      , daysSinceWeek1Started = (date.getTime() - startOfWeek1OfYear.getTime()) / DAY_IN_MS
-      , weekNr = Math.ceil((daysSinceWeek1Started + 1) / 7);
-    return weekNr > 0 ? weekNr : 53-weekNr;
-  };
+   function isWeek1(date) {
+    var d = new Date(+date), month = d.getMonth();
+    if (month!=MONTH_DEC && month!=MONTH_JAN) {return false;}
+    do {
+      month = d.getMonth(), dayNr = d.getDate();
+      if (month==MONTH_JAN) {
+        if (dayNr==4) {break;} // found jan 4th before a monday
+        if (d.getDay()==DAY_SUNDAY) {return false;}
+      }
+      d = new Date(+d+DAY_IN_MS)
+    } while(!(month==MONTH_JAN && dayNr==4));
+    return true;
+  }
+
+  function getWeekNr(date) {
+    var year = date.getFullYear();
+    var startOfFirstWeek = getStartOfFirstWeek(year);
+    var startOfThisWeek = getStartOfThisWeek(date);
+    var daysDiff = Math.ceil((+startOfThisWeek - startOfFirstWeek) / (DAY_IN_MS))+1;
+    var week = Math.ceil(daysDiff/7);
+    if (week==53 && isWeek1(date)) {return 1;}
+    if (week > 0) {return week;}
+    return getWeekNr(new Date(year-1, MONTH_DEC, 31));
+  }
+
+  return getWeekNr;
 
 }()));
+
+(function () {
+  var toExport = {"getWeekNr": getWeekNr};
+  (function() {
+    var undefinedType = "undefined";
+    if (undefinedType!=typeof module && undefinedType != typeof module.exports && "function" == typeof require) {
+      for (var name in this) {
+        exports[name] = this[name];
+      }
+    }
+  }).call(toExport);
+})();
