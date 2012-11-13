@@ -24,7 +24,7 @@ var getWeekNr;
 
   function getStartOfThisWeek(date) {
     var d = new Date(+date);
-    while(d.getDay()!=1) {d = daysLater(d, -1);}
+    while(d.getDay()!=DAY_MONDAY) {d = daysLater(d, -1);}
     return d;
   }
 
