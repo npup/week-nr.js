@@ -13,14 +13,18 @@ var getWeekNr;
     var firstWeekDate = new Date(year, 0, 4)
       , startofFirstWeek = new Date(+firstWeekDate);
     while (startofFirstWeek.getDay() != DAY_MONDAY) {
-      startofFirstWeek = new Date(+startofFirstWeek-DAY_IN_MS);
+      startofFirstWeek = daysLater(startofFirstWeek, -1);
     }
     return startofFirstWeek;
   }
 
+  function daysLater(date, steps) {
+    return new Date(date.getFullYear(), date.getMonth(), date.getDate()+steps);
+  }
+
   function getStartOfThisWeek(date) {
     var d = new Date(+date);
-    while(d.getDay()!=1) {d = new Date(+d-DAY_IN_MS);}
+    while(d.getDay()!=1) {d = daysLater(d, -1);}
     return d;
   }
 
@@ -33,7 +37,7 @@ var getWeekNr;
         if (dayNr==4) {break;} // found jan 4th before a monday
         if (d.getDay()==DAY_SUNDAY) {return false;}
       }
-      d = new Date(+d+DAY_IN_MS)
+      d = daysLater(d, 1);
     } while(!(month==MONTH_JAN && dayNr==4));
     return true;
   }

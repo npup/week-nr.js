@@ -14,9 +14,10 @@ var _ = {
 		return week;
 	}
 	, "testWeek": function (weekStart, weekNr) {
-		var week = this.getAWeek(weekStart);
+		var week = this.getAWeek(weekStart), actual;
 		for (var entry in week) {
-			assert.equals(getWeekNr(week[entry]), weekNr, "for date: "+week[entry].toDateString());
+			actual = getWeekNr(week[entry]);
+			assert.equals(actual, weekNr, "for date: "+week[entry].toDateString());
 		}
 	}
 };
