@@ -11,11 +11,11 @@ var getWeekNr;
   
   function getStartOfFirstWeek(year) {
     var firstWeekDate = new Date(year, 0, 4)
-      , startofFirstWeek = new Date(+firstWeekDate);
-    while (startofFirstWeek.getDay() != DAY_MONDAY) {
-      startofFirstWeek = daysLater(startofFirstWeek, -1);
+      , startOfFirstWeek = new Date(+firstWeekDate);
+    while (startOfFirstWeek.getDay() != DAY_MONDAY) {
+      startOfFirstWeek = daysLater(startOfFirstWeek, -1);
     }
-    return startofFirstWeek;
+    return startOfFirstWeek;
   }
 
   function daysLater(date, steps) {
