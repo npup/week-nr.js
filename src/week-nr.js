@@ -39,14 +39,14 @@ var getWeekNr;
   }
 
   function getWeekNr(date) {
-    var year = date.getFullYear();
-    var startOfFirstWeek = getStartOfFirstWeek(year);
-    var startOfThisWeek = getStartOfThisWeek(date);
-    var daysDiff = Math.ceil((+startOfThisWeek - startOfFirstWeek) / (DAY_IN_MS))+1;
-    var week = Math.ceil(daysDiff/7);
+    arguments.length < 1 && (date = new Date()); // no param yields result for "now"
+    var year = date.getFullYear()
+      , startOfFirstWeek = getStartOfFirstWeek(year)
+      , startOfThisWeek = getStartOfThisWeek(date)
+      , daysDiff = Math.ceil((+startOfThisWeek - startOfFirstWeek) / (DAY_IN_MS))+1
+      , week = Math.ceil(daysDiff/7);
     if (week==53 && isWeek1(date)) {return 1;}
-    if (week > 0) {return week;}
-    return getWeekNr(new Date(year-1, MONTH_DEC, 31));
+    return (week > 0) ? week : getWeekNr(new Date(year-1, MONTH_DEC, 31));
   }
 
   return getWeekNr;
