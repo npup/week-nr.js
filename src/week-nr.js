@@ -1,60 +1,34 @@
 /*
   The ISO 8601 standard defines week numbers using a Monday-based week (i.e. the week begins on Monday).
-
-  Under this definition, the first week of the year is determined to be the first week that contains a Wednesday.
-  For example, January 1, 2003 was on a Wednesday; therfore the week it lies in is week number 1 of 2003.
-  However, January 1, 2006 started on a Sunday; under the ISO 8601 week definition, this is considered the 52nd week of 2005.
+  The first week of a year is "the week that contains the first Thursday of the year", which
+  is the same as "the week with January 4th in it" (http://en.wikipedia.org/wiki/ISO_8601)
 */
 var getWeekNr;
 ("undefined"==typeof getWeekNr) && (getWeekNr= (function () {
   var DAY_IN_MS = 1000*60*60*24, DAY_MONDAY = 1, DAY_SUNDAY = 0, MONTH_JAN = 0, MONTH_DEC = 11;
-  
-  function getStartOfFirstWeek(year) {
-    var firstWeekDate = new Date(year, 0, 4)
-      , startOfFirstWeek = new Date(+firstWeekDate);
-    while (startOfFirstWeek.getDay() != DAY_MONDAY) {
-      startOfFirstWeek = daysLater(startOfFirstWeek, -1);
-    }
-    return startOfFirstWeek;
-  }
 
-  function daysLater(date, steps) {
-    return new Date(date.getFullYear(), date.getMonth(), date.getDate()+steps);
-  }
+  function getStartOfWeek(date) {return new Date(date.getFullYear(), date.getMonth(), date.getDate()-((date.getDay()||7)-1));}
+  function getStartOfFirstWeek(year) {return getStartOfWeek(new Date(year, 0, 4));}
 
-  function getStartOfThisWeek(date) {
-    var d = new Date(+date);
-    while(d.getDay()!=DAY_MONDAY) {d = daysLater(d, -1);}
-    return d;
-  }
-
-   function isWeek1(date) {
-    var d = new Date(+date), month = d.getMonth();
-    if (month!=MONTH_DEC && month!=MONTH_JAN) {return false;}
-    do {
-      month = d.getMonth(), dayNr = d.getDate();
-      if (month==MONTH_JAN) {
-        if (dayNr==4) {break;} // found jan 4th before a monday
-        if (d.getDay()==DAY_SUNDAY) {return false;}
-      }
-      d = daysLater(d, 1);
-    } while(!(month==MONTH_JAN && dayNr==4));
-    return true;
+  function isFirstWeek(date) { 
+    var month = date.getMonth(), d;
+    if (month!=MONTH_DEC && month!=MONTH_JAN) {return false;} // heavy optimization!!
+    d = new Date(date.getFullYear(), month, date.getDate()+(7-(date.getDay()||7))); // fast forward to upcoming sunday
+    return d.getDate() >= 4; // date is in a week that contains jan 4th?
   }
 
   function getWeekNr(date) {
     arguments.length < 1 && (date = new Date()); // no param yields result for "now"
     var year = date.getFullYear()
-      , startOfFirstWeek = getStartOfFirstWeek(year)
-      , startOfThisWeek = getStartOfThisWeek(date)
-      , daysDiff = Math.ceil((+startOfThisWeek - startOfFirstWeek) / (DAY_IN_MS))+1
+      , startOfFirstWeek = getStartOfFirstWeek(year) // obtain monday of the week that is week 1
+      , startOfWeek = getStartOfWeek(date) // obtain monday of the week of sought date
+      , daysDiff = Math.ceil((+startOfWeek - startOfFirstWeek) / (DAY_IN_MS))+1
       , week = Math.ceil(daysDiff/7);
-    if (week==53 && isWeek1(date)) {return 1;}
-    return (week > 0) ? week : getWeekNr(new Date(year-1, MONTH_DEC, 31));
+    if (week==53 && isFirstWeek(date)) {return 1;} // a week 53 might be a week 1 after all..
+    return (week > 0) ? week : getWeekNr(new Date(year-1, MONTH_DEC, 31)); // recurse if week belongs to previous year
   }
 
   return getWeekNr;
-
 }()));
 
 (function () {
