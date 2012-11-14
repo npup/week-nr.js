@@ -18,7 +18,7 @@ var getWeekNr;
   }
 
   function getWeekNr(date) {
-    arguments.length < 1 && (date = new Date()); // no param yields result for "now"
+    arguments.length < 1 && (date = new Date); // no param yields result for "now"
     var year = date.getFullYear()
       , startOfFirstWeek = getStartOfFirstWeek(year) // obtain monday of the week that is week 1
       , startOfWeek = getStartOfWeek(date) // obtain monday of the week of sought date
@@ -34,11 +34,9 @@ var getWeekNr;
 (function () {
   var toExport = {"getWeekNr": getWeekNr};
   (function() {
-    var undefinedType = "undefined";
-    if (undefinedType!=typeof module && undefinedType != typeof module.exports && "function" == typeof require) {
-      for (var name in this) {
-        exports[name] = this[name];
-      }
+    var api = this, undefinedType = "undefined";
+    if (undefinedType!=typeof module && undefinedType!=typeof module.exports && "function"==typeof require) {
+      for (var name in api) {exports[name] = api[name];}
     }
   }).call(toExport);
 })();
