@@ -5,12 +5,12 @@
 */
 var getWeekNr;
 ("undefined"==typeof getWeekNr) && (getWeekNr= (function () {
-  var DAY_IN_MS = 1000*60*60*24, DAY_MONDAY = 1, DAY_SUNDAY = 0, MONTH_JAN = 0, MONTH_DEC = 11;
+  var DAY_IN_MS = 1000*60*60*24, MONTH_JAN = 0, MONTH_DEC = 11;
 
   function getStartOfWeek(date) {return new Date(date.getFullYear(), date.getMonth(), date.getDate()-((date.getDay()||7)-1));}
   function getStartOfFirstWeek(year) {return getStartOfWeek(new Date(year, 0, 4));}
 
-  function isFirstWeek(date) { 
+  function isFirstWeek(date) {
     var month = date.getMonth(), d;
     if (month!=MONTH_DEC && month!=MONTH_JAN) {return false;} // heavy optimization!!
     d = new Date(date.getFullYear(), month, date.getDate()+(7-(date.getDay()||7))); // fast forward to upcoming sunday
