@@ -8,13 +8,13 @@ var getWeekNr;
   var DAY_IN_MS = 1000*60*60*24, MONTH_JAN = 0, MONTH_DEC = 11;
 
   function getStartOfWeek(date) {return new Date(date.getFullYear(), date.getMonth(), date.getDate()-((date.getDay()||7)-1));}
-  function getStartOfFirstWeek(year) {return getStartOfWeek(new Date(year, 0, 4));}
+  function getStartOfFirstWeek(year) {return getStartOfWeek(new Date(year, MONTH_JAN, 4));}
 
   function isFirstWeek(date) {
     var month = date.getMonth(), d;
     if (month!=MONTH_DEC && month!=MONTH_JAN) {return false;} // heavy optimization!!
     d = new Date(date.getFullYear(), month, date.getDate()+(7-(date.getDay()||7))); // fast forward to upcoming sunday
-    return d.getDate() >= 4; // date is in a week that contains jan 4th?
+    return d.getDate() > 3; // date is in a week that contains jan 4th?
   }
 
   function getWeekNr(date) {
@@ -22,7 +22,7 @@ var getWeekNr;
     var year = date.getFullYear()
       , startOfFirstWeek = getStartOfFirstWeek(year) // obtain monday of the week that is week 1
       , startOfWeek = getStartOfWeek(date) // obtain monday of the week of sought date
-      , daysDiff = Math.ceil((+startOfWeek - startOfFirstWeek) / (DAY_IN_MS))+1
+      , daysDiff = Math.ceil((+startOfWeek - startOfFirstWeek) / DAY_IN_MS)+1
       , week = Math.ceil(daysDiff/7);
     if (week==53 && isFirstWeek(date)) {return 1;} // a week 53 might be a week 1 after all..
     return (week > 0) ? week : getWeekNr(new Date(year-1, MONTH_DEC, 31)); // recurse if week belongs to previous year
